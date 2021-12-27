@@ -14,7 +14,7 @@ for any text processing.
 ## Getting Sigil
 
 ```shell
-go get github.com/UNO-SOFT/sigil/cmd/sigil
+go get github.com/UNO-SOFT/sigil/cmd/sigil@latest
 ```
 
 ## Using Sigil
@@ -57,7 +57,7 @@ Sometimes you want to use sigil to generate text, which uses golang templating i
 For example if you want to generate [packer](https://www.packer.io/docs/) configuration
 your template might contain a lot of `{{` and `}}`.
 
-Intead of replacing all `{{` with `{{“{{”}}`, you can change the delimiters,
+Instead of replacing all `{{` with `{{“{{”}}`, you can change the delimiters,
 by setting the `SIGIL_DELIMS` environment variable. It is the left and right
 delimiter strings, separated by a coma.
 

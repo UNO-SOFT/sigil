@@ -16,9 +16,9 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/UNO-SOFT/sigil"
 	"github.com/dustin/go-jsonpointer"
 	"github.com/flynn/go-shlex"
-	"github.com/gliderlabs/sigil"
 	"github.com/jmespath/go-jmespath"
 	"gopkg.in/yaml.v2"
 )
