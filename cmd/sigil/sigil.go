@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"runtime/pprof"
@@ -22,6 +23,7 @@ var (
 	posix      = flag.Bool("p", false, "preprocess with POSIX variable expansion")
 	version    = flag.Bool("v", false, "prints version")
 	cpuprofile = flag.String("cpuprofile", "", "write cpu profile to this file")
+	verbose    = flag.Bool("verbose", false, "verbose logging")
 )
 
 func template() ([]byte, string, error) {
@@ -48,6 +50,9 @@ func main() {
 	if *version {
 		fmt.Println(Version)
 		os.Exit(0)
+	}
+	if *verbose {
+		slog.SetDefault(slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{Level: slog.LevelDebug})))
 	}
 	if *cpuprofile != "" {
 		f, err := os.Create(*cpuprofile)
