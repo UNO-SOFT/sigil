@@ -12,4 +12,7 @@ require (
 	gopkg.in/yaml.v2 v2.2.8
 )
 
-require github.com/dustin/gojson v0.0.0-20160307161227-2e71ec9dd5ad // indirect
+require (
+	github.com/dustin/gojson v0.0.0-20160307161227-2e71ec9dd5ad // indirect
+	golang.org/x/text v0.15.0 // indirect
+)

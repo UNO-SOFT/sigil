@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/exec"
@@ -15,12 +17,17 @@ import (
 	"strconv"
 	"strings"
 	"text/template"
+	"time"
 
-	"github.com/UNO-SOFT/sigil"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
+
 	"github.com/dustin/go-jsonpointer"
 	"github.com/flynn/go-shlex"
 	"github.com/jmespath/go-jmespath"
 	"gopkg.in/yaml.v2"
+
+	"github.com/UNO-SOFT/sigil"
 )
 
 func init() {
@@ -83,10 +90,12 @@ func Shell(in interface{}) (interface{}, error) {
 	if err != nil {
 		return "", err
 	}
+	start := time.Now()
 	out, err := exec.Command(path, args[1:]...).Output()
 	if err != nil {
 		return "", err
 	}
+	slog.Debug("call", "cmd", args, "dur", time.Since(start))
 	return string(out), nil
 }
 
@@ -152,7 +161,7 @@ func Seq(i interface{}) ([]interface{}, error) {
 		return nil, fmt.Errorf("seq must be given an integer or numeric string")
 	}
 	var el []interface{}
-	for i, _ := range make([]bool, num) {
+	for i := 0; i < num; i++ {
 		el = append(el, strconv.Itoa(i))
 	}
 	return el, nil
@@ -208,12 +217,15 @@ func Substring(slice string, in interface{}) (interface{}, error) {
 	return in_[start:end], nil
 }
 
+var envLang, _, _ = strings.Cut(os.Getenv("LANG"), "_")
+var lang = language.MustParse(envLang)
+
 func Capitalize(in interface{}) (interface{}, error) {
 	in_, _, ok := sigil.String(in)
 	if !ok {
 		return "", fmt.Errorf("capitalize must be given a string")
 	}
-	return strings.Title(in_), nil
+	return cases.Title(lang).String(in_), nil
 }
 
 func Lower(in interface{}) (interface{}, error) {
@@ -251,7 +263,7 @@ func Trim(in interface{}) (interface{}, error) {
 func read(file interface{}) ([]byte, error) {
 	reader, ok := file.(sigil.NamedReader)
 	if ok {
-		return ioutil.ReadAll(reader)
+		return io.ReadAll(reader)
 	}
 	path, _, ok := sigil.String(file)
 	if !ok {
@@ -261,7 +273,7 @@ func read(file interface{}) ([]byte, error) {
 	if err != nil {
 		return []byte{}, err
 	}
-	data, err := ioutil.ReadFile(filepath)
+	data, err := os.ReadFile(filepath)
 	if err != nil {
 		return []byte{}, err
 	}
@@ -399,7 +411,7 @@ func JmesPath(path string, in interface{}) (interface{}, error) {
 
 func Render(args ...interface{}) (interface{}, error) {
 	if len(args) == 0 {
-		fmt.Errorf("render cannot be used without arguments")
+		return nil, errors.New("render cannot be used without arguments")
 	}
 	input := args[len(args)-1].(string)
 	var vars []interface{}
@@ -437,7 +449,7 @@ func Include(filename string, args ...interface{}) (interface{}, error) {
 	if err != nil {
 		return "", err
 	}
-	data, err := ioutil.ReadFile(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		return "", err
 	}
@@ -497,7 +509,7 @@ func Dir(in interface{}) ([]interface{}, error) {
 		return nil, fmt.Errorf("dir must be given a string")
 	}
 	var files []interface{}
-	dir, err := ioutil.ReadDir(path)
+	dir, err := os.ReadDir(path)
 	if err != nil {
 		return nil, err
 	}
@@ -513,7 +525,7 @@ func Dirs(in interface{}) ([]interface{}, error) {
 		return nil, fmt.Errorf("dirs must be given a string")
 	}
 	var dirs []interface{}
-	dir, err := ioutil.ReadDir(path)
+	dir, err := os.ReadDir(path)
 	if err != nil {
 		return nil, err
 	}
@@ -531,7 +543,7 @@ func Files(in interface{}) ([]interface{}, error) {
 		return nil, fmt.Errorf("files must be given a string")
 	}
 	var files []interface{}
-	dir, err := ioutil.ReadDir(path)
+	dir, err := os.ReadDir(path)
 	if err != nil {
 		return nil, err
 	}
@@ -551,7 +563,7 @@ func Uniq(in ...[]interface{}) []interface{} {
 		}
 	}
 	var uniq []interface{}
-	for k, _ := range m {
+	for k := range m {
 		uniq = append(uniq, k)
 	}
 	return uniq
