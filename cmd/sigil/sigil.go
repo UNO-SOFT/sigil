@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -13,15 +12,16 @@ import (
 
 	"github.com/UNO-SOFT/sigil"
 	_ "github.com/UNO-SOFT/sigil/builtin"
+	flag "github.com/spf13/pflag"
 )
 
 var Version string
 
 var (
-	filename   = flag.String("f", "", "use template file instead of STDIN")
-	inline     = flag.String("i", "", "use inline template string instead of STDIN")
-	posix      = flag.Bool("p", false, "preprocess with POSIX variable expansion")
-	version    = flag.Bool("v", false, "prints version")
+	filename   = flag.StringP("filename", "f", "", "use template file instead of STDIN")
+	inline     = flag.StringP("inline", "i", "", "use inline template string instead of STDIN")
+	posix      = flag.BoolP("posix", "p", false, "preprocess with POSIX variable expansion")
+	version    = flag.BoolP("version", "v", false, "prints version")
 	cpuprofile = flag.String("cpuprofile", "", "write cpu profile to this file")
 	verbose    = flag.Bool("verbose", false, "verbose logging")
 )
