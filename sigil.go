@@ -123,8 +123,8 @@ func Execute(input []byte, vars map[string]interface{}, name string) (bytes.Buff
 
 	inputStr = strings.Replace(
 		inputStr,
-		fmt.Sprintf("\\%s\n%s", rightDelim, leftDelim),
-		fmt.Sprintf("%s%s", rightDelim, leftDelim),
+		"\\"+rightDelim+"\n"+leftDelim,
+		rightDelim+leftDelim,
 		-1,
 	)
 	tmpl, err := template.New(name).Funcs(fnMap).Delims(leftDelim, rightDelim).Parse(tmplVars + inputStr)

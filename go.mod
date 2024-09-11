@@ -10,7 +10,7 @@ require (
 	github.com/jmespath/go-jmespath v0.4.0
 	github.com/mgood/go-posix v0.0.0-20240124183041-256a914b7416
 	github.com/spf13/pflag v1.0.5
-	golang.org/x/text v0.15.0
+	golang.org/x/text v0.18.0
 	gopkg.in/yaml.v2 v2.4.0
 )
 
